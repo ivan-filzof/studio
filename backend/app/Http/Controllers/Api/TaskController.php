@@ -25,7 +25,7 @@ class TaskController extends Controller
             'user_id'     => 'required|exists:users,id',
             'title'       => 'required|string|max:255|min:5',
             'description' => 'nullable|string',
-            'status'      => 'nullable|in:pending,in_progress,completed',
+            'status'      => 'nullable|in:todo,in-progress,done,canceled',
             'due_date'    => 'nullable|date|after_or_equal:today',
         ]);
 
@@ -47,7 +47,7 @@ class TaskController extends Controller
             'user_id'     => 'sometimes|exists:users,id',
             'title'       => 'sometimes|required|string|max:255|min:5',
             'description' => 'nullable|string',
-            'status'      => 'nullable|in:pending,in_progress,completed',
+            'status'      => 'nullable|in:todo,in-progress,done,canceled',
             'due_date'    => 'nullable|date|after_or_equal:today',
         ]);
 
