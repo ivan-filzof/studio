@@ -326,7 +326,7 @@ async function onSubmit(data: TaskFormValues) {
                     <SelectItem value="todo">To Do</SelectItem>
                     <SelectItem value="in-progress">In Progress</SelectItem>
                     <SelectItem value="done">Done</SelectItem>
-                    <SelectItem value="cancelled">Canceled</SelectItem>
+                    <SelectItem value="canceled">Canceled</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
