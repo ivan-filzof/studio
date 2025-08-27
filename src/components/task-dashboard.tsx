@@ -53,8 +53,6 @@ export default function TaskDashboard() {
   }, []);
 
 
-
-
   // 🔹 2. Add new task or update existing (POST or PUT to Laravel)
   const handleSaveTask = async (taskData: Omit<Task, 'id'> & { id?: string }) => {
     try {
