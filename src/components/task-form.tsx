@@ -129,6 +129,7 @@ async function onSubmit(data: TaskFormValues) {
         description: data.description || "",
         user_id: 1,
         status: data.status,
+        priority: data.priority,
         due_date: new Date(data.dueDate).toISOString().split("T")[0],
       }),
     });
