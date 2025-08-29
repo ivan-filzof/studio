@@ -27,6 +27,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'status'      => 'nullable|in:todo,in-progress,done,canceled',
             'due_date'    => 'nullable|date|after_or_equal:today',
+            'priority'    => 'nullable|in:low,medium,high',
         ]);
 
         $task = Task::create($validated);
@@ -49,6 +50,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'status'      => 'nullable|in:todo,in-progress,done,canceled',
             'due_date'    => 'nullable|date|after_or_equal:today',
+            'priority'    => 'nullable|in:low,medium,high',
         ]);
 
         $task->update($validated);

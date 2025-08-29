@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            // Change priority to ENUM with default
             $table->enum('priority', ['low', 'medium', 'high'])
-                  ->default('medium')
-                  ->change();
+              ->default('medium'); // NOT NULL by default; existing rows get 'medium'
         });
     }
 
@@ -25,8 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            // Rollback to text (not recommended but for safety)
-            $table->text('priority')->change();
+            $table->dropColumn('priority');
         });
     }
 };
