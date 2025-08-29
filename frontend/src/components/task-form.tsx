@@ -247,7 +247,7 @@ async function onSubmit(data: TaskFormValues) {
             name="priority"
             render={({ field }) => (
               <FormItem className="pt-2">
-                <FormLabel>Priorityasd</FormLabel>
+                <FormLabel>Priority</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
