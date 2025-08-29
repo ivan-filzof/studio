@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import TaskList from '@/components/task-list';
@@ -20,85 +20,75 @@ export default function TaskDashboard() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // 🔹 Reusable fetchTasks
+  const fetchTasks = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://127.0.0.1:8000/api/tasks');
+      if (!response.ok) throw new Error('Failed to fetch tasks');
+      const data = await response.json();
 
-  useEffect(() => {
-    async function fetchTasks() {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/tasks');
-        if (!response.ok) throw new Error('Failed to fetch tasks');
-        const data = await response.json();
+      // If Laravel returns { data: [...] }
+      const tasksArray = Array.isArray(data) ? data : data.data;
 
-        // If Laravel returns { data: [...] }
-        const tasksArray = Array.isArray(data) ? data : data.data;
+      const formatted = tasksArray.map((task: any) => ({
+        id: String(task.id),
+        title: task.title,
+        description: task.description,
+        dueDate: new Date(task.due_date),
+        priority: task.priority,
+        status: task.status,
+        userId: task.user_id,
+      }));
 
-        const formatted = tasksArray.map((task: any) => ({
-          id: String(task.id),
-          title: task.title,
-          description: task.description,
-          dueDate: new Date(task.due_date),
-          priority: task.priority,
-          status: task.status,
-          userId: task.user_id,
-        }));
-
-        setTasks(formatted);
-      } catch (err) {
-        console.error('Error fetching tasks:', err);
-      } finally {
-        setLoading(false);
-      }
+      setTasks(formatted);
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+    } finally {
+      setLoading(false);
     }
-
-    fetchTasks();
   }, []);
 
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
-  // 🔹 2. Add new task or update existing (POST or PUT to Laravel)
+  // 🔹 Add new task or update existing
   const handleSaveTask = async (taskData: Omit<Task, 'id'> & { id?: string }) => {
     try {
       if (taskData.id) {
         // update
-        const response = await fetch(`http://127.0.0.1:8000/api/tasks/${taskData.id}`, {
+        await fetch(`http://127.0.0.1:8000/api/tasks/${taskData.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(taskData),
         });
-        const updated = await response.json();
-
-        setTasks(tasks.map((t) => (t.id === String(updated.id) ? {
-          ...updated,
-          id: String(updated.id),
-          dueDate: new Date(updated.due_date),
-        } : t)));
       } else {
         // create
-        const response = await fetch('http://127.0.0.1:8000/api/tasks', {
+        await fetch('http://127.0.0.1:8000/api/tasks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(taskData),
         });
-        const created = await response.json();
-
-        setTasks([...tasks, {
-          ...created,
-          id: String(created.id),
-          dueDate: new Date(created.due_date),
-        }]);
       }
+
+      // ✅ Always re-fetch fresh tasks from backend
+      await fetchTasks();
       setIsSheetOpen(false);
     } catch (err) {
       console.error('Error saving task:', err);
     }
   };
 
-
-  // 🔹 3. Delete task
+  // 🔹 Delete task
   const handleDeleteTask = async (taskId: string) => {
     try {
       await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
         method: 'DELETE',
       });
-      setTasks(tasks.filter((task) => task.id !== taskId));
+
+      // ✅ Refresh list after deletion
+      await fetchTasks();
     } catch (err) {
       console.error('Error deleting task:', err);
     }
@@ -135,7 +125,9 @@ export default function TaskDashboard() {
               {selectedTask ? 'Edit Task' : 'Add New Task'}
             </SheetTitle>
             <SheetDescription>
-              {selectedTask ? 'Update the details of your task.' : 'Fill out the form to create a new task.'}
+              {selectedTask
+                ? 'Update the details of your task.'
+                : 'Fill out the form to create a new task.'}
             </SheetDescription>
           </SheetHeader>
           <TaskForm
@@ -146,11 +138,11 @@ export default function TaskDashboard() {
         </SheetContent>
       </Sheet>
 
-      <TaskList
-        tasks={tasks}
-        onEdit={handleEditTask}
-        onDelete={handleDeleteTask}
-      />
+      {loading ? (
+        <p className="text-muted-foreground">Loading tasks...</p>
+      ) : (
+        <TaskList tasks={tasks} onEdit={handleEditTask} onDelete={handleDeleteTask} />
+      )}
     </div>
   );
 }
