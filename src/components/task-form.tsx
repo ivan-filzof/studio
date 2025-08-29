@@ -69,47 +69,6 @@ export default function TaskForm({ task, onSave, onCancel }: TaskFormProps) {
     },
   });
 
-  // async function onSubmit(data: TaskFormValues) {
-  //   try {
-  //     const response = await fetch("http://127.0.0.1:8000/api/tasks", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "Accept": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         title: data.title,
-  //         description: data.description || "",
-  //         user_id: 1,
-  //         status: data.status,
-  //         due_date: new Date(data.dueDate).toISOString().split("T")[0],
-  //       }),
-  //     });
-
-  //     if (!response.ok) {
-  //       const err = await response.json();
-  //       throw new Error(err.message || "Failed to save task");
-  //     }
-
-  //     const saved = await response.json();
-  //     console.log("✅ Task saved:", saved);
-
-  //     toast({
-  //       title: "Task Saved",
-  //       description: `Task "${saved.title}" was successfully created.`,
-  //     });
-
-  //     onCancel();
-  //   } catch (error) {
-  //     console.error("❌ Error saving task:", error);
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to save task. Check backend logs.",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // }
-
 async function onSubmit(data: TaskFormValues) {
   try {
     const url = task?.id
